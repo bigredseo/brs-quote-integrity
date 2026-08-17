@@ -1,0 +1,17 @@
+{
+    "name":  "bigredseo/brs-quote-integrity",
+    "description":  "Detects links inserted into attributed XenForo quotes and provides moderator warnings plus an on-demand historical scanner.",
+    "type":  "project",
+    "require":  {
+
+                },
+    "require-dev":  {
+
+                    },
+    "config":  {
+                   "sort-packages":  true,
+                   "platform":  {
+                                    "php":  "8.2"
+                                }
+               }
+}
