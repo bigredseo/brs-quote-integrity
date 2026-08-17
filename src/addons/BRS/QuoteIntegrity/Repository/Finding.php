@@ -85,6 +85,34 @@ class Finding
 
         $rows = $db->fetchAll("\n            SELECT q.*\n            FROM xf_brs_quote_integrity AS q\n            {$whereSql}\n            ORDER BY q.detected_date DESC, q.finding_id DESC\n            LIMIT {$offset}, {$perPage}\n        ", $params);
 
+        $postIds = [];
+
+        foreach ($rows as $row)
+        {
+            $postIds[] = (int)$row['post_id'];
+            $postIds[] = (int)$row['quoted_post_id'];
+        }
+
+        $postIds = array_values(array_unique(array_filter($postIds)));
+
+        $posts = [];
+
+        if ($postIds)
+        {
+            $posts = $this->app->finder('XF:Post')
+                ->whereIds($postIds)
+                ->fetch()
+                ->toArray();
+        }
+
+        foreach ($rows as &$row)
+        {
+            $row['Post'] = $posts[$row['post_id']] ?? null;
+            $row['QuotedPost'] = $posts[$row['quoted_post_id']] ?? null;
+        }
+
+        unset($row);
+
         $total = (int)$db->fetchOne("\n            SELECT COUNT(*)\n            FROM xf_brs_quote_integrity AS q\n            {$whereSql}\n        ", $params);
 
         return [$rows, $total];
