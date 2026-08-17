@@ -1,0 +1,17 @@
+{
+    "admin/brs_quote_integrity_index.html": {
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "df64e1b0366d1dfba02bb7f72ea38b5f"
+    },
+    "admin/brs_quote_integrity_scan.html": {
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "b48622971ad1e734d8db93fd4aff96dd"
+    },
+    "public/brs_quote_integrity_warning.html": {
+        "version_id": 1000070,
+        "version_string": "1.0.0",
+        "hash": "657b079885a4a5c66c33fc515e311a27"
+    }
+}

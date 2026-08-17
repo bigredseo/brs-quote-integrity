@@ -1,0 +1,11 @@
+{
+    "route_type": "admin",
+    "route_prefix": "brs-quote-integrity",
+    "sub_name": "",
+    "format": "",
+    "build_class": "",
+    "build_method": "",
+    "controller": "BRS\\QuoteIntegrity\\Admin\\Controller\\QuoteIntegrity",
+    "context": "brsQuoteIntegrity",
+    "action_prefix": ""
+}

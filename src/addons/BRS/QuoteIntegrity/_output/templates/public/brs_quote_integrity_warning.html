@@ -1,0 +1,30 @@
+<xf:if is="$xf.visitor.is_moderator OR $xf.visitor.is_admin">
+    <xf:set var="$brsFindings" value="{{ $post.getBRSQuoteIntegrityFindings() }}" />
+
+    <xf:if is="$brsFindings">
+        <div class="messageNotice messageNotice--warning" style="margin-top: 8px;">
+            <strong>Quote Integrity:</strong>
+
+            {{ count($brsFindings) == 1
+                ? '1 link was added to quoted content.'
+                : count($brsFindings) . ' links were added to quoted content.'
+            }}
+
+            <ul style="margin: 6px 0 0 20px;">
+                <xf:foreach loop="$brsFindings" value="$finding">
+                    <li>
+                        <a href="{$finding.added_url}"
+                            target="_blank"
+                            rel="nofollow noopener">{$finding.added_domain}</a>
+
+                        &middot;
+
+                        <a href="{{ link('posts', null, {'post_id': $finding.quoted_post_id}) }}">
+                            View original post
+                        </a>
+                    </li>
+                </xf:foreach>
+            </ul>
+        </div>
+    </xf:if>
+</xf:if>

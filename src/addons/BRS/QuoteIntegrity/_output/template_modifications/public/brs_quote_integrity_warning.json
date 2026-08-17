@@ -1,0 +1,9 @@
+{
+    "template": "post_macros",
+    "description": "Displays the BRS Quote Integrity warning below a post when a link was added to quoted content.",
+    "execution_order": 10,
+    "enabled": true,
+    "action": "preg_replace",
+    "find": "#<xf:extension id=\"footer\">#",
+    "replace": "$0\n<xf:include template=\"brs_quote_integrity_warning\" />"
+}

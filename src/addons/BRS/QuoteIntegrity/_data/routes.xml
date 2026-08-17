@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<routes>
+  <route route_type="admin" route_prefix="brs-quote-integrity" controller="BRS\QuoteIntegrity\Admin\Controller\QuoteIntegrity" context="brsQuoteIntegrity"/>
+</routes>

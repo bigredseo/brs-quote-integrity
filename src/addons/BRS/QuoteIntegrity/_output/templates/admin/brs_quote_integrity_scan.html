@@ -1,0 +1,18 @@
+<xf:title>BRS Quote Integrity: Historical Scan</xf:title>
+
+<div class="blockMessage blockMessage--important">
+    This scanner only runs when started here. It scans in batches and writes only findings where a URL was added to attributed quoted content.
+</div>
+
+<xf:form action="{{ link('brs-quote-integrity/scan') }}" ajax="true" class="block">
+    <div class="block-container">
+        <h2 class="block-header">Start historical scan</h2>
+        <div class="block-body">
+            <xf:textboxrow name="username" label="Posting user" explain="Leave blank to scan all users." />
+            <xf:textboxrow name="start_date" label="From date" hint="YYYY-MM-DD" explain="Leave blank for no lower date limit." />
+            <xf:textboxrow name="end_date" label="To date" hint="YYYY-MM-DD" explain="Leave blank for no upper date limit." />
+            <xf:numberboxrow name="node_id" min="0" label="Forum node ID" explain="0 scans all forums." />
+        </div>
+        <xf:submitrow submit="Queue historical scan" icon="search" />
+    </div>
+</xf:form>

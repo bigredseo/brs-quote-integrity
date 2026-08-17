@@ -1,0 +1,16 @@
+{
+  "legacy_addon_id": "",
+  "title": "BRS Quote Integrity",
+  "description": "Detects links inserted into attributed XenForo quotes and provides moderator warnings plus an on-demand historical scanner.",
+  "version_id": 1000070,
+  "version_string": "1.0.0",
+  "dev": "Big Red SEO",
+  "dev_url": "https://www.bigredseo.com/",
+  "faq_url": "https://www.bigredseo.com/",
+  "support_url": "https://www.bigredseo.com/",
+  "extra_urls": [],
+  "require": {
+    "XF": [2030010, "XenForo 2.3.0+"]
+  },
+  "icon": "fa-quote-left"
+}

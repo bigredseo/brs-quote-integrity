@@ -1,0 +1,109 @@
+<?xml version="1.0" encoding="utf-8"?>
+<templates>
+  <template type="admin" title="brs_quote_integrity_index" version_id="1000070" version_string="1.0.0"><![CDATA[<xf:title>BRS Quote Integrity</xf:title>
+
+<xf:pageaction>
+    <xf:button href="{{ link('brs-quote-integrity/scan') }}" icon="search">Historical scan</xf:button>
+</xf:pageaction>
+
+<xf:form action="{{ link('brs-quote-integrity') }}" class="block">
+    <div class="block-container">
+        <h2 class="block-header">Filter findings</h2>
+        <div class="block-body">
+            <xf:textboxrow name="username" value="{$filters.username}" label="Posting user" />
+            <xf:textboxrow name="domain" value="{$filters.domain}" label="Inserted domain" />
+            <xf:textboxrow name="from" value="{$filters.from}" label="Detected from" hint="YYYY-MM-DD" />
+            <xf:textboxrow name="to" value="{$filters.to}" label="Detected to" hint="YYYY-MM-DD" />
+        </div>
+        <xf:submitrow submit="Filter" />
+    </div>
+</xf:form>
+
+<div class="block">
+    <div class="block-container">
+        <h2 class="block-header">Findings ({$total|number})</h2>
+        <div class="block-body">
+            <xf:if is="$findings">
+                <div class="dataList">
+                    <div class="dataList-row dataList-row--header">
+                        <div class="dataList-cell">Detected</div>
+                        <div class="dataList-cell">User</div>
+                        <div class="dataList-cell">Inserted domain / URL</div>
+                        <div class="dataList-cell">Quoted user</div>
+                        <div class="dataList-cell">Source</div>
+                        <div class="dataList-cell">Post</div>
+                    </div>
+                    <xf:foreach loop="$findings" value="$finding">
+                        <div class="dataList-row">
+                            <div class="dataList-cell"><xf:date time="{$finding.detected_date}" /></div>
+                            <div class="dataList-cell">{$finding.username}</div>
+                            <div class="dataList-cell">
+                                <strong>{$finding.added_domain}</strong><br />
+                                <span class="u-muted">{$finding.added_url}</span>
+                            </div>
+                            <div class="dataList-cell">{$finding.quoted_username}</div>
+                            <div class="dataList-cell">{$finding.source}</div>
+                            <div class="dataList-cell">
+                                <a href="{{ link('posts', null, {'post_id': $finding.post_id}) }}" target="_blank">View reply</a><br />
+                                <a href="{{ link('posts', null, {'post_id': $finding.quoted_post_id}) }}" target="_blank">View original</a>
+                            </div>
+                        </div>
+                    </xf:foreach>
+                </div>
+            <xf:else />
+                <div class="block-row">No quote-integrity findings match these filters.</div>
+            </xf:if>
+        </div>
+    </div>
+</div>
+
+<xf:pagenav page="{$page}" perpage="{$perPage}" total="{$total}" link="brs-quote-integrity" params="{$filters}" />]]></template>
+  <template type="admin" title="brs_quote_integrity_scan" version_id="1000070" version_string="1.0.0"><![CDATA[<xf:title>BRS Quote Integrity: Historical Scan</xf:title>
+
+<div class="blockMessage blockMessage--important">
+    This scanner only runs when started here. It scans in batches and writes only findings where a URL was added to attributed quoted content.
+</div>
+
+<xf:form action="{{ link('brs-quote-integrity/scan') }}" ajax="true" class="block">
+    <div class="block-container">
+        <h2 class="block-header">Start historical scan</h2>
+        <div class="block-body">
+            <xf:textboxrow name="username" label="Posting user" explain="Leave blank to scan all users." />
+            <xf:textboxrow name="start_date" label="From date" hint="YYYY-MM-DD" explain="Leave blank for no lower date limit." />
+            <xf:textboxrow name="end_date" label="To date" hint="YYYY-MM-DD" explain="Leave blank for no upper date limit." />
+            <xf:numberboxrow name="node_id" min="0" label="Forum node ID" explain="0 scans all forums." />
+        </div>
+        <xf:submitrow submit="Queue historical scan" icon="search" />
+    </div>
+</xf:form>]]></template>
+  <template type="public" title="brs_quote_integrity_warning" version_id="1000070" version_string="1.0.0"><![CDATA[<xf:if is="$xf.visitor.is_moderator OR $xf.visitor.is_admin">
+    <xf:set var="$brsFindings" value="{{ $post.getBRSQuoteIntegrityFindings() }}" />
+
+    <xf:if is="$brsFindings">
+        <div class="messageNotice messageNotice--warning" style="margin-top: 8px;">
+            <strong>Quote Integrity:</strong>
+
+            {{ count($brsFindings) == 1
+                ? '1 link was added to quoted content.'
+                : count($brsFindings) . ' links were added to quoted content.'
+            }}
+
+            <ul style="margin: 6px 0 0 20px;">
+                <xf:foreach loop="$brsFindings" value="$finding">
+                    <li>
+                        <a href="{$finding.added_url}"
+                            target="_blank"
+                            rel="nofollow noopener">{$finding.added_domain}</a>
+
+                        &middot;
+
+                        <a href="{{ link('posts', null, {'post_id': $finding.quoted_post_id}) }}">
+                            View original post
+                        </a>
+                    </li>
+                </xf:foreach>
+            </ul>
+        </div>
+    </xf:if>
+</xf:if>]]></template>
+</templates>
