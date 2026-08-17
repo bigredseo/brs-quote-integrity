@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1 - 2026-08-17
+
+### Fixed
+- Fixed the ACP findings history display so scan results use XenForo's native data table formatting.
+- Fixed "View reply" and "View original" links in the ACP to correctly open the associated public forum posts.
+- Fixed the moderator/admin quote integrity warning so "View original post" correctly links to the quoted source post.
+
 ## 1.0.0 - 2026-08-10
 
 - Initial BRS Quote Integrity development build.

@@ -105,10 +105,23 @@ class Finding
                 ->toArray();
         }
 
+        $router = $this->app->router('public');
+
         foreach ($rows as &$row)
         {
-            $row['Post'] = $posts[$row['post_id']] ?? null;
-            $row['QuotedPost'] = $posts[$row['quoted_post_id']] ?? null;
+            $post = $posts[$row['post_id']] ?? null;
+            $quotedPost = $posts[$row['quoted_post_id']] ?? null;
+
+            $row['Post'] = $post;
+            $row['QuotedPost'] = $quotedPost;
+
+            $row['post_url'] = $post
+                ? $router->buildLink('canonical:posts', $post)
+                : '';
+
+            $row['quoted_post_url'] = $quotedPost
+                ? $router->buildLink('canonical:posts', $quotedPost)
+                : '';
         }
 
         unset($row);

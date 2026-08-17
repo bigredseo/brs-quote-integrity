@@ -72,6 +72,9 @@ class QuoteAnalyzer
                     'quoted_post_id' => (int)$sourcePost->post_id,
                     'quoted_user_id' => (int)$sourcePost->user_id,
                     'quoted_username' => (string)$sourcePost->username,
+                    'quoted_post_url' => $this->app
+                        ->router('public')
+                        ->buildLink('canonical:posts', $sourcePost),
                     'added_url' => $url,
                     'added_domain' => $this->domainFromUrl($url),
                     'normalized_url' => $normalized
