@@ -22,13 +22,13 @@ class Listener
         {
             $analyzer = new Service\QuoteAnalyzer(\XF::app());
             $findings = $analyzer->analyzePost($entity);
-            if (!$findings)
-            {
-                return;
-            }
 
             $repository = new Repository\Finding(\XF::app());
-            $repository->recordMany($findings, 'live');
+            $repository->syncPostFindings(
+                (int)$entity->post_id,
+                $findings,
+                'live'
+            );
         }
         catch (\Throwable $e)
         {

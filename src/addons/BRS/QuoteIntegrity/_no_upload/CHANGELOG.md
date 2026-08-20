@@ -1,5 +1,22 @@
 # Changelog
 
+## 1.1.0 - 2026-08-20
+
+### Added
+- Added finding statuses: `open`, `ignored`, and `resolved`.
+- Added an ACP action to manually ignore reviewed findings.
+- Added an Undo ignore action to restore ignored findings to the open list.
+- Added status filtering in the ACP findings screen.
+- Added Open and Ignored finding counts for easier navigation between actionable and ignored findings.
+- Added automatic resolution when a previously recorded finding is no longer present after a post is reanalyzed.
+- Added automatic reopening when a previously resolved finding is detected again.
+
+### Changed
+- Live post analysis now reconciles existing findings after post edits instead of only recording new findings.
+- Historical scans now reconcile existing findings for posts they actually analyze instead of only recording new findings.
+- Ignored findings remain ignored during subsequent live and historical analysis.
+- Findings default to the Open status so ignored and resolved findings no longer clutter the actionable findings list.
+
 ## 1.0.1 - 2026-08-17
 
 ### Fixed

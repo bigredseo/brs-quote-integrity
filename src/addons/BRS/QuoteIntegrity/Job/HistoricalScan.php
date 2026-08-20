@@ -68,7 +68,12 @@ class HistoricalScan extends AbstractJob
 
                 $this->data['candidates']++;
                 $findings = $analyzer->analyzePost($post);
-                $this->data['findings'] += $repository->recordMany($findings, 'historical');
+
+                $this->data['findings'] += $repository->syncPostFindings(
+                    (int)$post->post_id,
+                    $findings,
+                    'historical'
+                );
 
                 if (microtime(true) - $start >= $maxRunTime)
                 {

@@ -6,6 +6,7 @@ use XF\AddOn\AbstractSetup;
 use XF\AddOn\StepRunnerInstallTrait;
 use XF\AddOn\StepRunnerUninstallTrait;
 use XF\AddOn\StepRunnerUpgradeTrait;
+use XF\Db\Schema\Alter;
 use XF\Db\Schema\Create;
 
 class Setup extends AbstractSetup
@@ -30,13 +31,38 @@ class Setup extends AbstractSetup
             $table->addColumn('added_url', 'text');
             $table->addColumn('added_domain', 'varchar', 255)->setDefault('');
             $table->addColumn('url_hash', 'varbinary', 32);
-            $table->addColumn('source', 'enum')->values(['live', 'historical'])->setDefault('live');
+            $table->addColumn('source', 'enum')
+                ->values(['live', 'historical'])
+                ->setDefault('live');
+
+            $table->addColumn('status', 'enum')
+                ->values(['open', 'ignored', 'resolved'])
+                ->setDefault('open');
+            $table->addColumn('status_date', 'int')->setDefault(0);
+            $table->addColumn('status_user_id', 'int')->setDefault(0);
+
             $table->addPrimaryKey('finding_id');
             $table->addUniqueKey(['post_id', 'quoted_post_id', 'url_hash'], 'post_quote_url');
             $table->addKey('detected_date');
             $table->addKey('user_id');
             $table->addKey('quoted_post_id');
             $table->addKey('added_domain');
+            $table->addKey('status');
+        });
+    }
+
+    public function upgrade1010070Step1()
+    {
+        $this->schemaManager()->alterTable('xf_brs_quote_integrity', function (Alter $table)
+        {
+            $table->addColumn('status', 'enum')
+                ->values(['open', 'ignored', 'resolved'])
+                ->setDefault('open');
+
+            $table->addColumn('status_date', 'int')->setDefault(0);
+            $table->addColumn('status_user_id', 'int')->setDefault(0);
+
+            $table->addKey('status');
         });
     }
 

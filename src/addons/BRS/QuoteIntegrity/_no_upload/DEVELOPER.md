@@ -9,6 +9,7 @@ Detect links inserted into attributed XenForo quotes when those links were not p
 ## Architecture
 
 ### `Service/QuoteAnalyzer.php`
+
 Shared analysis engine used by both live monitoring and historical scans.
 
 1. Fast pre-check for `[QUOTE` plus URL-like content.
@@ -21,19 +22,32 @@ Shared analysis engine used by both live monitoring and historical scans.
 The parser uses a stack for quote boundaries instead of a single recursive regex so manually nested quote blocks do not immediately break matching.
 
 ### `Listener.php`
-Listens to `entity_post_save` for `XF\\Entity\\Post` and runs only on inserts or when the `message` field changes. New findings are written with `source = live`.
+
+Listens to `entity_post_save` for `XF\Entity\Post` and runs only on inserts or when the `message` field changes.
+
+Live analysis uses the shared analyzer and reconciles the post's current findings against previously stored findings. New findings are written with `source = live`. Existing open findings that are no longer detected are marked `resolved`. A previously resolved finding is reopened if the same condition is detected again. Findings marked `ignored` are not automatically reopened.
 
 ### `XF/Entity/Post.php`
-Adds `getBRSQuoteIntegrityFindings()` for the moderator-facing template. This is intentionally calculated from the **current message**, not the findings table. Therefore a corrected post stops showing a warning while the original detection row remains historically available.
+
+Adds `getBRSQuoteIntegrityFindings()` for the moderator-facing template. This is intentionally calculated from the **current message**, not the findings table. Therefore a corrected post stops showing a moderator warning immediately, while its stored detection record remains available in the findings history.
 
 ### `Repository/Finding.php`
+
 Small data-access class for the dedicated findings table. The unique key prevents the same reply/source/URL combination from being inserted repeatedly.
 
+The repository also manages finding state. Findings default to `open`. Administrators can manually mark a finding as `ignored`, while live and historical re-analysis can automatically mark an open finding as `resolved` when the condition is no longer present. A resolved finding is reopened if the same condition is detected again. Ignored findings are not automatically reopened.
+
 ### `Job/HistoricalScan.php`
+
 On-demand XenForo job. Processes a maximum of 250 quote-containing posts per finder batch and yields when its allotted job runtime is exhausted. Filters can restrict the scan by date, user, and forum node.
 
+Each post that is actually analyzed is reconciled against its existing stored findings. New findings are recorded as `historical`, open findings that are no longer detected are marked `resolved`, and previously resolved findings are reopened if detected again. Findings outside the scope of the scan are not changed.
+
 ### `Admin/Controller/QuoteIntegrity.php`
+
 Provides the running findings list and form used to enqueue a historical scan.
+
+The ACP findings workflow supports filtering by status, manually ignoring open findings, and restoring ignored findings to the open list. Open and ignored counts are also exposed for navigation between actionable and ignored findings.
 
 ## Table
 
@@ -52,8 +66,24 @@ Key fields:
 - `added_domain`
 - `url_hash`
 - `source` (`live` or `historical`)
+- `status` (`open`, `ignored`, or `resolved`)
+- `status_date`
+- `status_user_id`
 
-There is intentionally no review state.
+`source` and `status` represent different concepts:
+
+- `source` records how the finding was originally detected: `live` or `historical`.
+- `status` records its current disposition: `open`, `ignored`, or `resolved`.
+
+Status behavior:
+
+- `open` - the finding is currently actionable.
+- `ignored` - an administrator reviewed the finding and intentionally removed it from the actionable list.
+- `resolved` - subsequent analysis confirmed that the previously detected condition is no longer present.
+
+Ignored findings are retained so subsequent scans do not recreate them as actionable findings. Resolved findings are also retained as historical records and reopen automatically if the same condition is detected again.
+
+`status_date` records when a finding was ignored or resolved. `status_user_id` records the administrator who ignored a finding; automatic resolution uses `0`.
 
 ## Historical behavior
 
@@ -66,9 +96,13 @@ The historical scanner should be started manually from the ACP. Recommended orde
 
 The table stores matches only, so a 100,000-post forum does not become a 100,000-row add-on table.
 
+Historical scans reconcile only posts they actually analyze. A date-, user-, or node-limited scan does not resolve findings belonging to posts outside that scan's scope.
+
 ## False-positive strategy
 
 This add-on intentionally avoids trying to decide whether ordinary quoted text was changed. Only URL insertion is considered. Common tracking parameters are stripped before comparison.
+
+Findings that are legitimate exceptions can be marked `ignored` in the ACP rather than deleted. This preserves the audit record and prevents the same finding from becoming actionable again during a later scan.
 
 Possible cases to test before general distribution:
 
